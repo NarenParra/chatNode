@@ -94,7 +94,6 @@
                        } else {
                            $("#login-error").show();
                        }
-                       console.log('jmmm que pas');
                    });
                });
 
@@ -104,7 +103,14 @@
 				$message.val('');
 			});
 			socket.on('new message', function(data) {
-				$chat.append('<b>'+data.msg+"<br/>"); 
+				$chat.append(data.nick+'<br/>'+'- '+data.msg+"<br/>"); 
+			});
+			socket.on('usernames',function(data){
+				var $usernamesString ="";
+				for (var $username in data){
+					$usernamesString += $username +"<br/>";
+				}
+				$users.html($usernamesString);
 			});
 		});
 	</script>
