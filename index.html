@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Node.js Chat</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<style>
+
+		#content{
+			display: none;
+
+		}
+
+		#chatContent{
+			float: left;
+
+		}
+		#chat{
+			position: relative;
+			width: 100%;
+			float:left;
+			min-height:300px;
+			height: 90%;
+			overflow: auto;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="page-header">
+			<h1>Node.js chat <small>Desarrollado por <a href="http://www.algo.com" target="_blank"> ira ala fuente</a></small></h1>
+		</div>
+		<div class="input-group" style="width: 300px; text-align: center; margin: 0 auto;" id="nickContainer">
+			<input type="text" id="nickname" class="form-control input-lg" placeholder="Enter your username">
+			<samp class="input-group-btn" >
+				<button class="btn btn-lg btn-primary" type="submit" id="setNick">OK</button>
+			</samp>
+		</div>
+		<div class="alert fade in alert-danger alert-dismissable" data-dismiss='alert' id="login-error"  style=" display: none; width: 300px; text-align: center; margin: 0 auto;">
+			<button type="button" class="close" id="closeAlert">X</button>
+			that user name is ready taken. tray again.
+		</div>
+
+		<div id="content" class="row" style="height: 70%;">
+			<div class="col-md-2"></div>
+			<div id="chatContent" class="col-md-6">
+				<div class=" panel panel-success">
+					<div class="panel-heading">CHAT</div>
+					<div id="chat" class="panel-body"></div>
+				</div>
+				<div> 
+					<form id="sendMessage" class="input-group" style="text-align: center;margin: 0 auto;">
+						<input id="message" class="form-control input-lg" type="text">
+						<span class="input-group-btn">
+							<button class="btn btn-lg btn-primary" type="submit">Send</button>
+						</span>
+					</form>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						USERS
+					</div>
+					<div class="panel-body" id="users"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		jQuery(function($){
+			var socket = io.connect();
+			var $messageForm = $('#sendMessage');
+			var $message = $('#message');
+			var $chat = $('#chat');
+		//usuario
+			var $users =$('#users');
+			var $nickname= $('#nickname');
+			var $setNick = $('#setNick');
+
+               $setNick.click(function(e) {
+                   e.preventDefault();
+                   socket.emit('new user', $nickname.val(), function(data) {
+                       if(data) {
+                           $('#nickContainer').hide();
+                           $('#content').show();
+
+                       } else {
+                           $("#login-error").show();
+                       }
+                       console.log('jmmm que pas');
+                   });
+               });
+
+			$messageForm.submit(function(e) {
+				e.preventDefault();
+				if($message.val()!='') socket.emit('send message', $message.val());
+				$message.val('');
+			});
+			socket.on('new message', function(data) {
+				$chat.append('<b>'+data.msg+"<br/>"); 
+			});
+		});
+	</script>
+</body>
+</html>
